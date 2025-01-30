@@ -10,6 +10,8 @@ interface LayoutProps {
 }
 
 export default function Layout({ children }: LayoutProps) {
+  const isLoggedIn = localStorage.getItem("token");
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSignInOpen, setIsSignInOpen] = useState(false);
 
@@ -38,13 +40,15 @@ export default function Layout({ children }: LayoutProps) {
 
           {/* Right Icons */}
           <div className="flex items-center space-x-4">
-            <Button
-              onClick={() => setIsSignInOpen(true)}
-              variant="outline"
-              size="sm"
-            >
-              Sign In
-            </Button>
+            {!isLoggedIn && (
+              <Button
+                onClick={() => setIsSignInOpen(true)}
+                variant="outline"
+                size="sm"
+              >
+                Sign In
+              </Button>
+            )}
             {/* Mobile Menu Button */}
             <button
               className="md:hidden p-2"

@@ -10,12 +10,63 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Dispatch, FC, SetStateAction, useState } from "react";
+import { useSignInMutation, useSignUpMutation } from "@/store/service/authApi";
+import { toast } from "react-toastify";
 
 export const SignInModal: FC<{
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
 }> = ({ open, setOpen }) => {
   const [isSignIn, setIsSignIn] = useState(true);
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+
+  // RTK Query hooks
+  const [signIn, { isLoading: isSignInLoading, isError: signInError }] =
+    useSignInMutation();
+  const [signUp, { isLoading: isSignUpLoading, isError: signUpError }] =
+    useSignUpMutation();
+
+  // Handle form data changes
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.id]: e.target.value,
+    });
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (isSignIn) {
+      signIn({
+        email: formData.email,
+        password: formData.password,
+      })
+        .unwrap()
+        .then(({ token }) => {
+          localStorage.setItem("token", token);
+          setOpen(false);
+        });
+    } else {
+      if (formData.password !== formData.confirmPassword) {
+        toast.error("Passwords do not match");
+        return;
+      }
+
+      signUp({
+        username: formData.name,
+        email: formData.email,
+        password: formData.password,
+      }).unwrap();
+      toast.success("Signed up successfully! verify from your email");
+      setOpen(false);
+    }
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -34,7 +85,7 @@ export const SignInModal: FC<{
           </DialogDescription>
         </DialogHeader>
 
-        <form className="space-y-4">
+        <form className="space-y-4" onSubmit={handleSubmit}>
           {/* Name Field (Only for Sign-Up) */}
           {!isSignIn && (
             <div className="space-y-2">
@@ -43,6 +94,8 @@ export const SignInModal: FC<{
                 id="name"
                 type="text"
                 placeholder="Enter your full name"
+                value={formData.name}
+                onChange={handleChange}
                 required
               />
             </div>
@@ -55,6 +108,8 @@ export const SignInModal: FC<{
               id="email"
               type="email"
               placeholder="Enter your email"
+              value={formData.email}
+              onChange={handleChange}
               required
             />
           </div>
@@ -66,6 +121,8 @@ export const SignInModal: FC<{
               id="password"
               type="password"
               placeholder="Enter your password"
+              value={formData.password}
+              onChange={handleChange}
               required
             />
           </div>
@@ -75,19 +132,38 @@ export const SignInModal: FC<{
             <div className="space-y-2">
               <Label htmlFor="confirm-password">Confirm Password</Label>
               <Input
-                id="confirm-password"
+                id="confirmPassword"
                 type="password"
                 placeholder="Confirm your password"
+                value={formData.confirmPassword}
+                onChange={handleChange}
                 required
               />
             </div>
           )}
 
           {/* Submit Button */}
-          <Button className="w-full" type="submit">
-            {isSignIn ? "Sign In" : "Sign Up"}
+          <Button
+            className="w-full"
+            type="submit"
+            disabled={isSignIn ? isSignInLoading : isSignUpLoading}
+          >
+            {isSignIn
+              ? isSignInLoading
+                ? "Signing In..."
+                : "Sign In"
+              : isSignUpLoading
+              ? "Signing Up..."
+              : "Sign Up"}
           </Button>
         </form>
+
+        {/* Error message */}
+        {(signInError || signUpError) && (
+          <div className="text-red-600 mt-2">
+            {signInError ? "Error signing in!" : "Error signing up!"}
+          </div>
+        )}
 
         {/* Toggle between Sign In & Sign Up */}
         <div className="text-center text-sm text-gray-500 dark:text-gray-400 mt-4">
