@@ -1,5 +1,6 @@
 import axios from "axios";
 import config from "@/config";
+import { toast } from "react-toastify";
 import { createApi } from "@reduxjs/toolkit/query/react";
 
 const axiosInstance = axios.create({
@@ -39,6 +40,7 @@ export const baseApi = createApi({
       });
       return { data: response.data };
     } catch (error: any) {
+      toast.error(error?.response?.data?.message || "Something went wrong");
       return {
         error: {
           status: error.response?.status || "UNKNOWN_ERROR",

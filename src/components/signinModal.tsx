@@ -4,7 +4,6 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -26,10 +25,8 @@ export const SignInModal: FC<{
   });
 
   // RTK Query hooks
-  const [signIn, { isLoading: isSignInLoading, isError: signInError }] =
-    useSignInMutation();
-  const [signUp, { isLoading: isSignUpLoading, isError: signUpError }] =
-    useSignUpMutation();
+  const [signIn, { isLoading: isSignInLoading }] = useSignInMutation();
+  const [signUp, { isLoading: isSignUpLoading }] = useSignUpMutation();
 
   // Handle form data changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -62,17 +59,20 @@ export const SignInModal: FC<{
         username: formData.name,
         email: formData.email,
         password: formData.password,
-      }).unwrap();
-      toast.success("Signed up successfully! verify from your email");
-      setOpen(false);
+      })
+        .unwrap()
+        .then((data) => {
+          console.log(data);
+          debugger;
+
+          toast.success("Signed up successfully! verify from your email");
+          setOpen(false);
+        });
     }
   };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline">Sign In</Button>
-      </DialogTrigger>
       <DialogContent className="max-w-md p-6">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold">
@@ -157,13 +157,6 @@ export const SignInModal: FC<{
               : "Sign Up"}
           </Button>
         </form>
-
-        {/* Error message */}
-        {(signInError || signUpError) && (
-          <div className="text-red-600 mt-2">
-            {signInError ? "Error signing in!" : "Error signing up!"}
-          </div>
-        )}
 
         {/* Toggle between Sign In & Sign Up */}
         <div className="text-center text-sm text-gray-500 dark:text-gray-400 mt-4">

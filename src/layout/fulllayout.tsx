@@ -1,16 +1,22 @@
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { Menu } from "lucide-react";
-import { useState } from "react";
+import { Menu, User } from "lucide-react";
 import { SignInModal } from "@/components/signinModal";
+import useAuth from "@/hooks/useAuth";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface LayoutProps {
   children: ReactNode;
 }
 
 export default function Layout({ children }: LayoutProps) {
-  const isLoggedIn = localStorage.getItem("token");
+  const { isLoggedIn, user, handleLogout } = useAuth();
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSignInOpen, setIsSignInOpen] = useState(false);
@@ -40,7 +46,7 @@ export default function Layout({ children }: LayoutProps) {
 
           {/* Right Icons */}
           <div className="flex items-center space-x-4">
-            {!isLoggedIn && (
+            {!isLoggedIn ? (
               <Button
                 onClick={() => setIsSignInOpen(true)}
                 variant="outline"
@@ -48,7 +54,28 @@ export default function Layout({ children }: LayoutProps) {
               >
                 Sign In
               </Button>
+            ) : (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="flex items-center space-x-2 p-2 bg-gray-200 dark:bg-gray-700 rounded-full">
+                    <User className="w-5 h-5 text-gray-900 dark:text-white" />
+                    <span className="hidden md:inline text-gray-900 dark:text-white">
+                      {user?.username}
+                    </span>
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem>Profile</DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={handleLogout}
+                    className="text-red-500"
+                  >
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             )}
+
             {/* Mobile Menu Button */}
             <button
               className="md:hidden p-2"
