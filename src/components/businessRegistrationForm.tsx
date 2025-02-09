@@ -27,7 +27,7 @@ const businessSchema = z.object({
 
 type BusinessFormData = z.infer<typeof businessSchema>;
 
-export default function RegisterBusiness() {
+export default function BusinessRegistrationForm() {
   const mapRef = useRef<L.Map | null>(null);
   const {
     register,

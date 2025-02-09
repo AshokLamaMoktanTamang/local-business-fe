@@ -3,12 +3,12 @@ import { Button } from "@/components/ui/button";
 import { FC, PropsWithChildren } from "react";
 import useAuth from "@/hooks/useAuth";
 import { USER_ROLE } from "@/store/service/authApi";
-import RegisterBusiness from "@/components/businessRegistrationForm";
 
 const BusinessLayout: FC<PropsWithChildren> = ({ children }) => {
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
 
-  if (!user || user.role !== USER_ROLE.BUSINESS) return <RegisterBusiness />;
+  if (!isLoading && (!user || user.role !== USER_ROLE.USER))
+    return <Navigate to={"/"} replace />;
 
   return (
     <div className="flex min-h-screen">

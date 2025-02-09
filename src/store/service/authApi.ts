@@ -3,7 +3,6 @@ import { baseApi } from "@/store/baseApi";
 export enum USER_ROLE {
   USER = "USER",
   ADMIN = "ADMIN",
-  BUSINESS = "BUSINESS",
 }
 
 export const authApi = baseApi.injectEndpoints({
