@@ -10,9 +10,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Outlet } from "react-router-dom";
 
 interface LayoutProps {
-  children: ReactNode;
+  children?: ReactNode;
 }
 
 export default function Layout({ children }: LayoutProps) {
@@ -110,7 +111,7 @@ export default function Layout({ children }: LayoutProps) {
         )}
 
         {/* Main Content */}
-        <main className="flex-1 p-6">{children}</main>
+        <main className="flex-1 p-6">{children ?? <Outlet />}</main>
 
         {/* Footer */}
         <footer className="text-center py-4 text-gray-600 dark:text-gray-400">
