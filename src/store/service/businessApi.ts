@@ -13,7 +13,32 @@ export const businessApi = baseApi.injectEndpoints({
         },
       }),
     }),
+    getBusiness: builder.query<
+      Array<{
+        location: {
+          latitude: number;
+          longitude: number;
+        };
+        _id: string;
+        name: string;
+        description: string;
+        phone: number;
+        email: string;
+        owner: string;
+        isVerified: boolean;
+        address: string;
+        image: string;
+        createdAt: string;
+        updatedAt: string;
+      }>,
+      { owner: string }
+    >({
+      query: ({ owner }) => ({
+        url: `business?owner=${owner}`,
+        method: "GET",
+      }),
+    }),
   }),
 });
 
-export const { useRegisterBusinessMutation } = businessApi;
+export const { useRegisterBusinessMutation, useGetBusinessQuery } = businessApi;
