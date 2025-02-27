@@ -137,7 +137,10 @@ export default function BusinessRegistrationForm() {
   };
 
   useEffect(() => {
-    if (!businessId || !business) return;
+    if (!businessId || !business) {
+      reset();
+      return;
+    }
 
     const {
       address,
