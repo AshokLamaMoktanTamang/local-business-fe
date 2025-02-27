@@ -9,6 +9,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { RichTextEditor } from "./editor";
+import { useRegisterBusinessMutation } from "@/store/service/businessApi";
+import { useNavigate } from "react-router-dom";
+import { FileUploader } from "./fileUploader";
 
 const customIcon = new L.Icon({
   iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
@@ -21,19 +25,24 @@ const businessSchema = z.object({
   email: z.string().email("Invalid email"),
   phone: z.string().min(10, "Phone number must be at least 10 digits"),
   address: z.string().min(5, "Address must be at least 5 characters"),
+  description: z.string({ description: "Description is required" }),
   latitude: z.string(),
   longitude: z.string(),
+  image: z.any(),
 });
 
 type BusinessFormData = z.infer<typeof businessSchema>;
 
 export default function BusinessRegistrationForm() {
+  const navigate = useNavigate();
   const mapRef = useRef<L.Map | null>(null);
+
   const {
     register,
     handleSubmit,
     setValue,
     watch,
+    control,
     formState: { errors },
   } = useForm<BusinessFormData>({
     resolver: zodResolver(businessSchema),
@@ -42,12 +51,12 @@ export default function BusinessRegistrationForm() {
       longitude: "85.28153697270993",
     },
   });
+  const [registerBusiness, { isLoading }] = useRegisterBusinessMutation();
 
   const [loading, setLoading] = useState(false);
   const lat = parseFloat(watch("latitude"));
   const lon = parseFloat(watch("longitude"));
 
-  // Function to fetch coordinates from an address
   const fetchCoordinates = async (address: string) => {
     setLoading(true);
     try {
@@ -74,9 +83,8 @@ export default function BusinessRegistrationForm() {
     }
   };
 
-  // Component to handle dragging the map marker
   function LocationMarker() {
-    const map = useMapEvents({
+    useMapEvents({
       click(e) {
         setValue("latitude", e.latlng.lat.toString());
         setValue("longitude", e.latlng.lng.toString());
@@ -99,9 +107,12 @@ export default function BusinessRegistrationForm() {
     ) : null;
   }
 
-  // Handle Form Submission
   const onSubmit = (data: BusinessFormData) => {
-    console.log("Business Registered:", data);
+    registerBusiness(data)
+      .unwrap()
+      .then(() => {
+        navigate("/business/my-businesses");
+      });
   };
 
   return (
@@ -109,7 +120,6 @@ export default function BusinessRegistrationForm() {
       <h2 className="text-2xl font-semibold mb-4">Register a Business</h2>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        {/* Business Name */}
         <div>
           <label className="block text-sm font-medium">Business Name</label>
           <Input {...register("name")} placeholder="Enter business name" />
@@ -118,7 +128,11 @@ export default function BusinessRegistrationForm() {
           )}
         </div>
 
-        {/* Email */}
+        <div>
+          <label className="block text-sm font-medium">Business Image</label>
+          <FileUploader name="image" control={control} />
+        </div>
+
         <div>
           <label className="block text-sm font-medium">Email</label>
           <Input
@@ -131,7 +145,6 @@ export default function BusinessRegistrationForm() {
           )}
         </div>
 
-        {/* Phone */}
         <div>
           <label className="block text-sm font-medium">Phone</label>
           <Input
@@ -144,7 +157,14 @@ export default function BusinessRegistrationForm() {
           )}
         </div>
 
-        {/* Address with Auto-Fill Button */}
+        <div>
+          <label className="block text-sm font-medium">Description</label>
+          <RichTextEditor {...register("description")} control={control} />
+          {errors.description && (
+            <p className="text-red-500 text-sm">{errors.description.message}</p>
+          )}
+        </div>
+
         <div>
           <label className="block text-sm font-medium">Address</label>
           <div className="flex gap-2">
@@ -165,7 +185,6 @@ export default function BusinessRegistrationForm() {
           )}
         </div>
 
-        {/* Interactive Map */}
         <div>
           <label className="block text-sm font-medium">Location</label>
           <MapContainer
@@ -182,22 +201,19 @@ export default function BusinessRegistrationForm() {
           </MapContainer>
         </div>
 
-        {/* Latitude */}
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium">Latitude</label>
             <Input type="text" {...register("latitude")} readOnly />
           </div>
 
-          {/* Longitude */}
           <div>
             <label className="block text-sm font-medium">Longitude</label>
             <Input type="text" {...register("longitude")} readOnly />
           </div>
         </div>
 
-        {/* Submit Button */}
-        <Button type="submit" className="w-full">
+        <Button disabled={isLoading} type="submit" className="w-full">
           Register Business
         </Button>
       </form>

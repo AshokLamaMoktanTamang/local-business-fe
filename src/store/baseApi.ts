@@ -31,12 +31,13 @@ axiosInstance.interceptors.response.use(
 
 export const baseApi = createApi({
   reducerPath: "baseApi",
-  baseQuery: async ({ url, method = "GET", body }: any) => {
+  baseQuery: async ({ url, method = "GET", body, headers }: any) => {
     try {
       const response = await axiosInstance({
         url,
         method,
         data: body,
+        headers,
       });
       return { data: response.data };
     } catch (error: any) {
