@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -10,8 +10,12 @@ import { Button } from "@/components/ui/button";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { RichTextEditor } from "./editor";
-import { useRegisterBusinessMutation } from "@/store/service/businessApi";
-import { useNavigate } from "react-router-dom";
+import {
+  useEditBusinessMutation,
+  useGetBusinessByIdQuery,
+  useRegisterBusinessMutation,
+} from "@/store/service/businessApi";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { FileUploader } from "./fileUploader";
 
 const customIcon = new L.Icon({
@@ -23,7 +27,7 @@ const customIcon = new L.Icon({
 const businessSchema = z.object({
   name: z.string().min(3, "Business name must be at least 3 characters"),
   email: z.string().email("Invalid email"),
-  phone: z.string().min(10, "Phone number must be at least 10 digits"),
+  phone: z.number().min(10, "Phone number must be at least 10 digits"),
   address: z.string().min(5, "Address must be at least 5 characters"),
   description: z.string({ description: "Description is required" }),
   latitude: z.string(),
@@ -34,8 +38,15 @@ const businessSchema = z.object({
 type BusinessFormData = z.infer<typeof businessSchema>;
 
 export default function BusinessRegistrationForm() {
+  const [searchParams] = useSearchParams();
+
+  const businessId = searchParams.get("business");
   const navigate = useNavigate();
   const mapRef = useRef<L.Map | null>(null);
+  const { data: business } = useGetBusinessByIdQuery(
+    { id: businessId || "" },
+    { skip: !businessId }
+  );
 
   const {
     register,
@@ -44,6 +55,7 @@ export default function BusinessRegistrationForm() {
     watch,
     control,
     formState: { errors },
+    reset,
   } = useForm<BusinessFormData>({
     resolver: zodResolver(businessSchema),
     defaultValues: {
@@ -52,6 +64,7 @@ export default function BusinessRegistrationForm() {
     },
   });
   const [registerBusiness, { isLoading }] = useRegisterBusinessMutation();
+  const [updateBusiness, { isLoading: updating }] = useEditBusinessMutation();
 
   const [loading, setLoading] = useState(false);
   const lat = parseFloat(watch("latitude"));
@@ -108,12 +121,44 @@ export default function BusinessRegistrationForm() {
   }
 
   const onSubmit = (data: BusinessFormData) => {
-    registerBusiness(data)
-      .unwrap()
-      .then(() => {
-        navigate("/business/my-businesses");
-      });
+    if (businessId) {
+      updateBusiness({ id: businessId, data })
+        .unwrap()
+        .then(() => {
+          navigate("/business/my-businesses");
+        });
+    } else {
+      registerBusiness(data)
+        .unwrap()
+        .then(() => {
+          navigate("/business/my-businesses");
+        });
+    }
   };
+
+  useEffect(() => {
+    if (!businessId || !business) return;
+
+    const {
+      address,
+      location: { latitude, longitude },
+      description,
+      email,
+      image,
+      name,
+      phone,
+    } = business;
+    reset({
+      address,
+      latitude,
+      longitude,
+      description,
+      email,
+      image,
+      name,
+      phone,
+    });
+  }, [businessId, business]);
 
   return (
     <div className="max-w-3xl mx-auto p-6 bg-white shadow-md rounded-lg">
@@ -213,8 +258,12 @@ export default function BusinessRegistrationForm() {
           </div>
         </div>
 
-        <Button disabled={isLoading} type="submit" className="w-full">
-          Register Business
+        <Button
+          disabled={isLoading || updating}
+          type="submit"
+          className="w-full"
+        >
+          {businessId ? "Edit" : "Register"} Business
         </Button>
       </form>
     </div>
