@@ -10,13 +10,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
+import { USER_ROLE } from "@/store/service/authApi";
 
 interface LayoutProps {
   children?: ReactNode;
 }
 
 export default function Layout({ children }: LayoutProps) {
+  const navigate = useNavigate();
   const { isLoggedIn, user, handleLogout } = useAuth();
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -67,6 +69,15 @@ export default function Layout({ children }: LayoutProps) {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem>Profile</DropdownMenuItem>
+                  {user?.role === USER_ROLE.ADMIN ? (
+                    <DropdownMenuItem onClick={() => navigate("/admin")}>
+                      Admin Panel
+                    </DropdownMenuItem>
+                  ) : (
+                    <DropdownMenuItem onClick={() => navigate("/business")}>
+                      Business Panel
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem
                     onClick={handleLogout}
                     className="text-red-500"

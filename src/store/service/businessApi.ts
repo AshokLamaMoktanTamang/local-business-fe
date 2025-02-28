@@ -93,6 +93,32 @@ export const businessApi = baseApi
           "business",
         ],
       }),
+      listUnverifiedBusiness: builder.query<
+        Array<{
+          location: {
+            latitude: number;
+            longitude: number;
+          };
+          _id: string;
+          name: string;
+          description: string;
+          phone: number;
+          email: string;
+          owner: string;
+          isVerified: boolean;
+          address: string;
+          image: string;
+          createdAt: string;
+          updatedAt: string;
+        }>,
+        void
+      >({
+        query: () => ({
+          url: `business/list/unverified`,
+          method: "GET",
+        }),
+        providesTags: ["business"],
+      })
     }),
   });
 
@@ -102,4 +128,5 @@ export const {
   useGetBusinessByIdQuery,
   useEditBusinessMutation,
   useDeleteBusinessMutation,
+  useListUnverifiedBusinessQuery
 } = businessApi;

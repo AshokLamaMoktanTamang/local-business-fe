@@ -7,7 +7,9 @@ import BusinessDashboard from "./pages/businessDashboard";
 import RegisterBusiness from "./pages/registerBusiness";
 import MyBusiness from "./pages/myBusiness";
 
-import './App.scss'
+import "./App.scss";
+import AdminLayout from "./layout/adminLayout";
+import AdminBusiness from "./pages/adminBusiness";
 
 export default function App() {
   return (
@@ -21,6 +23,10 @@ export default function App() {
           <Route path="" element={<BusinessDashboard />} />
           <Route path="register" element={<RegisterBusiness />} />
           <Route path="my-businesses" element={<MyBusiness />} />
+        </Route>
+
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route path="" element={<AdminBusiness />} />
         </Route>
       </Routes>
     </Router>

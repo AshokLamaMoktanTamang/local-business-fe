@@ -8,7 +8,7 @@ const useAuth = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    window.location.reload();
+    window.location.href = "/";
   };
 
   return {
@@ -16,7 +16,7 @@ const useAuth = () => {
     isLoading,
     refetchUser: refetch,
     isLoggedIn: Boolean(data),
-    handleLogout
+    handleLogout,
   };
 };
 
