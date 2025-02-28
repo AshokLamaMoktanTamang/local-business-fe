@@ -1,6 +1,6 @@
-import { Outlet, Link, Navigate } from "react-router-dom";
+import { Outlet, Link, Navigate, useNavigate } from "react-router-dom";
 import { FC, PropsWithChildren } from "react";
-import { Home, Briefcase, Building, LogOut } from "lucide-react";
+import { Home, Briefcase, Building, LogOut, HomeIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import useAuth from "@/hooks/useAuth";
 import { USER_ROLE } from "@/store/service/authApi";
@@ -13,7 +13,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 const BusinessLayout: FC<PropsWithChildren> = ({ children }) => {
-  const { user, isLoading } = useAuth();
+  const navigate = useNavigate();
+  const { user, isLoading, handleLogout } = useAuth();
 
   if (!isLoading && (!user || user.role !== USER_ROLE.USER))
     return <Navigate to="/" replace />;
@@ -61,7 +62,10 @@ const BusinessLayout: FC<PropsWithChildren> = ({ children }) => {
               </Avatar>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate("/")}>
+                <HomeIcon className="mr-2 h-4 w-4" /> Home
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleLogout}>
                 <LogOut className="mr-2 h-4 w-4" /> Logout
               </DropdownMenuItem>
             </DropdownMenuContent>

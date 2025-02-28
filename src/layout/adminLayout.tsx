@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { LayoutDashboard, Users, Settings, LogOut } from "lucide-react";
+import { LayoutDashboard, Users, Settings, LogOut, HomeIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -8,7 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet, useNavigate } from "react-router-dom";
 import useAuth from "@/hooks/useAuth";
 import { USER_ROLE } from "@/store/service/authApi";
 
@@ -32,6 +32,7 @@ const Sidebar = () => {
 };
 
 const Navbar = () => {
+  const navigate = useNavigate();
   const { handleLogout } = useAuth();
 
   return (
@@ -48,6 +49,9 @@ const Navbar = () => {
           </Avatar>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
+          <DropdownMenuItem onClick={() => navigate("/")}>
+            <HomeIcon className="mr-2 h-4 w-4" /> Home
+          </DropdownMenuItem>
           <DropdownMenuItem>
             <Settings className="mr-2 h-4 w-4" /> Settings
           </DropdownMenuItem>
