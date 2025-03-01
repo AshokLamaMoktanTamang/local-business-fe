@@ -27,7 +27,10 @@ const customIcon = new L.Icon({
 const businessSchema = z.object({
   name: z.string().min(3, "Business name must be at least 3 characters"),
   email: z.string().email("Invalid email"),
-  phone: z.number().min(10, "Phone number must be at least 10 digits"),
+  phone: z
+    .string()
+    .min(10, "Phone number must be at least 10 digits")
+    .regex(/^\d+$/, "Phone number must contain only digits"),
   address: z.string().min(5, "Address must be at least 5 characters"),
   description: z.string({ description: "Description is required" }),
   latitude: z.string(),
@@ -159,7 +162,7 @@ export default function BusinessRegistrationForm() {
       email,
       image,
       name,
-      phone,
+      phone: phone.toString(),
     });
   }, [businessId, business]);
 

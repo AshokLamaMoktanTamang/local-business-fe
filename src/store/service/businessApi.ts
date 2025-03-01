@@ -118,7 +118,15 @@ export const businessApi = baseApi
           method: "GET",
         }),
         providesTags: ["business"],
-      })
+      }),
+      verifyBusiness: builder.mutation<void, { id: string; verify: boolean }>({
+        query: ({ id, ...rest }) => ({
+          url: `business/${id}/verify`,
+          method: "POST",
+          body: rest,
+        }),
+        invalidatesTags: ["business"],
+      }),
     }),
   });
 
@@ -128,5 +136,6 @@ export const {
   useGetBusinessByIdQuery,
   useEditBusinessMutation,
   useDeleteBusinessMutation,
-  useListUnverifiedBusinessQuery
+  useListUnverifiedBusinessQuery,
+  useVerifyBusinessMutation,
 } = businessApi;

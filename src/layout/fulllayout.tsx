@@ -126,7 +126,7 @@ export default function Layout({ children }: LayoutProps) {
 
         {/* Footer */}
         <footer className="text-center py-4 text-gray-600 dark:text-gray-400">
-          © {new Date().getFullYear()} MyApp. All rights reserved.
+          © {new Date().getFullYear()} Local Business. All rights reserved.
         </footer>
       </div>
 

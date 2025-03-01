@@ -13,7 +13,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import config from "@/config";
-import { useListUnverifiedBusinessQuery } from "@/store/service/businessApi";
+import {
+  useListUnverifiedBusinessQuery,
+  useVerifyBusinessMutation,
+} from "@/store/service/businessApi";
 import { Loader, MoreVertical, Check, X, AlertTriangle } from "lucide-react";
 import { useState } from "react";
 import { toast } from "react-toastify";
@@ -22,29 +25,29 @@ const AdminBusiness = () => {
   const [businessActionData, setBusinessActionData] = useState<null | {
     name: string;
     id: string;
-    isVerified: boolean;
+    action: "approve" | "disapprove";
   }>(null);
 
   const { data, isLoading } = useListUnverifiedBusinessQuery();
-  // const [approveBusiness, { isLoading: approving }] =
-  //   useApproveBusinessMutation();
+  const [approveBusiness, { isLoading: approving }] =
+    useVerifyBusinessMutation();
 
   const handleBusinessAction = (
     action: "approve" | "disapprove",
-    { id, name, isVerified }: { id: string; name: string; isVerified: boolean }
+    { id, name }: { id: string; name: string }
   ) => {
-    setBusinessActionData({ id, name, isVerified });
+    setBusinessActionData({ id, name, action });
   };
 
   const handleApproveBusiness = (id: string, approve: boolean) => {
-    // approveBusiness({ id, isVerified: approve })
-    //   .unwrap()
-    //   .then(() => {
-    //     setBusinessActionData(null);
-    //     toast.success(
-    //       approve ? "Business approved successfully!" : "Business disapproved!"
-    //     );
-    //   });
+    approveBusiness({ id, verify: approve })
+      .unwrap()
+      .then(() => {
+        setBusinessActionData(null);
+        toast.success(
+          approve ? "Business approved successfully!" : "Business disapproved!"
+        );
+      });
   };
 
   if (isLoading) return <Loader className="animate-spin mx-auto" />;
@@ -87,33 +90,28 @@ const AdminBusiness = () => {
                       </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      {!isVerified ? (
-                        <DropdownMenuItem
-                          onClick={() =>
-                            handleBusinessAction("approve", {
-                              id: _id,
-                              name,
-                              isVerified,
-                            })
-                          }
-                        >
-                          <Check className="w-4 h-4 mr-2 text-green-500" />{" "}
-                          Approve
-                        </DropdownMenuItem>
-                      ) : (
-                        <DropdownMenuItem
-                          onClick={() =>
-                            handleBusinessAction("disapprove", {
-                              id: _id,
-                              name,
-                              isVerified,
-                            })
-                          }
-                          className="text-red-500"
-                        >
-                          <X className="w-4 h-4 mr-2" /> Disapprove
-                        </DropdownMenuItem>
-                      )}
+                      <DropdownMenuItem
+                        onClick={() =>
+                          handleBusinessAction("approve", {
+                            id: _id,
+                            name,
+                          })
+                        }
+                      >
+                        <Check className="w-4 h-4 mr-2 text-green-500" />{" "}
+                        Approve
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() =>
+                          handleBusinessAction("disapprove", {
+                            id: _id,
+                            name,
+                          })
+                        }
+                        className="text-red-500"
+                      >
+                        <X className="w-4 h-4 mr-2" /> Disapprove
+                      </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
@@ -159,8 +157,7 @@ const AdminBusiness = () => {
           </DialogHeader>
 
           <DialogDescription className="text-gray-600">
-            Are you sure you want to{" "}
-            {businessActionData?.isVerified ? "disapprove" : "approve"}
+            Are you sure you want to {businessActionData?.action}
             <span className="font-semibold">{businessActionData?.name}</span>?
           </DialogDescription>
 
@@ -168,24 +165,28 @@ const AdminBusiness = () => {
             <Button
               variant="outline"
               onClick={() => setBusinessActionData(null)}
-              // disabled={approving}
+              disabled={approving}
             >
               Cancel
             </Button>
             <Button
               variant={
-                businessActionData?.isVerified ? "destructive" : "default"
+                businessActionData?.action === "disapprove"
+                  ? "destructive"
+                  : "default"
               }
               onClick={() =>
                 businessActionData?.id &&
                 handleApproveBusiness(
                   businessActionData.id,
-                  !businessActionData.isVerified
+                  businessActionData.action === "approve"
                 )
               }
-              // disabled={approving}
+              disabled={approving}
             >
-              {businessActionData?.isVerified ? "Disapprove" : "Approve"}
+              {businessActionData?.action === "disapprove"
+                ? "Disapprove"
+                : "Approve"}
             </Button>
           </div>
         </DialogContent>
