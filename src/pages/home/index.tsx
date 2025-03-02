@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import config from "@/config";
 import { motion } from "framer-motion";
-import { useOutletContext } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 
 const highlightText = (text: string, query: string) => {
   if (!query) return text;
@@ -21,6 +21,7 @@ const highlightText = (text: string, query: string) => {
 };
 
 export default function Home() {
+  const navigate = useNavigate();
   const { data, isLoading } = useListVerifiedBusinessQuery();
   const { searchQuery } = useOutletContext<any>();
 
@@ -59,6 +60,7 @@ export default function Home() {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.3 }}
+            onClick={() => navigate(`/${business._id}`)}
           >
             <Card className="hover:shadow-2xl transition-all rounded-lg overflow-hidden">
               <CardHeader className="p-0">

@@ -10,7 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { USER_ROLE } from "@/store/service/authApi";
 import {
   Carousel,
@@ -25,6 +25,7 @@ interface LayoutProps {
 }
 
 export default function Layout({ children }: LayoutProps) {
+  const { pathname } = useLocation();
   const navigate = useNavigate();
   const { isLoggedIn, user, handleLogout } = useAuth();
   const { data, isLoading } = useListVerifiedBusinessQuery();
@@ -115,7 +116,7 @@ export default function Layout({ children }: LayoutProps) {
         </motion.nav>
 
         {/* Hero Carousel */}
-        {!searchQuery.length && (
+        {!searchQuery.length && pathname === "/" && (
           <Carousel className="w-full h-[400px] mx-auto shadow-lg">
             <CarouselContent>
               {data?.slice(0, 5).map((business) => (

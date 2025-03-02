@@ -157,6 +157,36 @@ export const businessApi = baseApi
         }),
         providesTags: ["business"],
       }),
+      getBusinessDetail: builder.query<
+        {
+          _id: string;
+          name: string;
+          description: string;
+          phone: number;
+          email: string;
+          owner: {
+            _id: string;
+            username: string;
+            email: string;
+          };
+          location: {
+            latitude: number;
+            longitude: number;
+          };
+          isVerified: true;
+          address: string;
+          image: string;
+          createdAt: string;
+          updatedAt: string;
+        },
+        { id: string }
+      >({
+        query: ({ id }) => ({
+          url: `business/detail/${id}`,
+          method: "GET",
+        }),
+        providesTags: ["business"],
+      }),
     }),
   });
 
@@ -169,4 +199,5 @@ export const {
   useListUnverifiedBusinessQuery,
   useVerifyBusinessMutation,
   useListVerifiedBusinessQuery,
+  useGetBusinessDetailQuery,
 } = businessApi;
