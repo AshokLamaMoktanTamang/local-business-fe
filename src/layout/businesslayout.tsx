@@ -42,10 +42,14 @@ const BusinessLayout: FC<PropsWithChildren> = ({ children }) => {
             My Businesses
           </SidebarLink>
         </nav>
-        <div className="mt-auto">
-          <SidebarLink to="/logout" icon={<LogOut className="h-5 w-5" />}>
-            Logout
-          </SidebarLink>
+        <div
+          className={cn(
+            "mt-auto cursor-pointer flex items-center gap-3 p-3 rounded-md hover:bg-gray-800 transition"
+          )}
+          onClick={handleLogout}
+        >
+          <LogOut className="h-5 w-5" />
+          Logout
         </div>
       </aside>
 
