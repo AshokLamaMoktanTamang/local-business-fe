@@ -47,6 +47,9 @@ const ChatLayout = () => {
 
   return (
     <div className="flex h-screen">
+        <Button className="absolute right-[30px] top-[30px]" variant={"outline"} onClick={() => navigate("/")}>
+          Go To Home
+        </Button>
       <div className="w-1/4 bg-gray-100 p-4 border-r">
         <h2 className="font-semibold text-lg text-gray-900 mb-4">Chat Rooms</h2>
         <input
