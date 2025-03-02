@@ -52,11 +52,7 @@ const BusinessDetail = () => {
                 <p className="text-gray-600">📍 {business.address}</p>
                 <p className="text-gray-600">📞 {business.phone}</p>
                 <p className="text-gray-600">✉️ {business.email}</p>
-                {user && (
-                  <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-                    Contact Owner
-                  </Button>
-                )}
+                {user && <Button variant={"default"}>Contact Owner</Button>}
               </div>
             </div>
           </CardContent>
