@@ -100,8 +100,7 @@ const BusinessChat = () => {
           <h2 className="text-2xl font-semibold text-gray-800">
             {business.name}
           </h2>
-          <p className="text-gray-600 text-sm line-clamp-2">
-            {business.description}
+          <p className="text-gray-600 text-sm line-clamp-2" dangerouslySetInnerHTML={{__html: business.description}}>
           </p>
           <p className="text-gray-500 text-sm">📍 {business.address}</p>
           <p className="text-gray-500 text-sm">📞 {business.phone}</p>
