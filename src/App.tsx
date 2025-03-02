@@ -12,6 +12,7 @@ import AdminLayout from "./layout/adminLayout";
 import AdminBusiness from "./pages/adminBusiness";
 import BusinessDetail from "./pages/businessDetailPage";
 import ChatLayout from "./layout/chatlayout";
+import BusinessChat from "./pages/businessChat";
 
 export default function App() {
   return (
@@ -26,15 +27,15 @@ export default function App() {
           <Route path="" element={<BusinessDashboard />} />
           <Route path="register" element={<RegisterBusiness />} />
           <Route path="my-businesses" element={<MyBusiness />} />
+          <Route path="my-businesses/:businessId" element={<BusinessChat />} />
         </Route>
 
         <Route path="/admin" element={<AdminLayout />}>
           <Route path="" element={<AdminBusiness />} />
         </Route>
 
-        <Route path="/chat" element={<ChatLayout />}>
-          <Route path=":chatId" element={<BusinessDashboard />} />
-        </Route>
+        <Route path="/chat" element={<ChatLayout />} />
+        <Route path="/chat/:chatId" element={<ChatLayout />} />
       </Routes>
     </Router>
   );

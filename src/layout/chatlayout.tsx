@@ -2,9 +2,13 @@ import { Button } from "@/components/ui/button";
 import config from "@/config";
 import useAuth from "@/hooks/useAuth";
 import { useListVerifiedBusinessQuery } from "@/store/service/businessApi";
+import { useListBusinesschatsQuery } from "@/store/service/chatApi";
 import { Loader2 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Navigate, Outlet, useNavigate, useParams } from "react-router-dom";
+import io from "socket.io-client";
+
+const socket = io("http://localhost:3001");
 
 const highlightText = (text: string, query: string) => {
   if (!query) return text;
@@ -24,17 +28,15 @@ const ChatLayout = () => {
   const navigate = useNavigate();
   const { chatId = "" } = useParams();
   const [searchQuery, setSearchQuery] = useState("");
+  const [messages, setMessages] = useState<{ sender: string; text: string }[]>(
+    []
+  );
+  const [newMessage, setNewMessage] = useState("");
 
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, user, isLoading: userLoading } = useAuth();
   const { data, isLoading } = useListVerifiedBusinessQuery();
 
-  if (!isLoggedIn) return <Navigate to={"/"} replace />;
-  if (isLoading)
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <Loader2 className="animate-spin w-10 h-10 text-gray-500" />
-      </div>
-    );
+  const messagesEndRef = useRef(null);
 
   const filteredBusinesses = data?.filter(
     (business) =>
@@ -43,13 +45,77 @@ const ChatLayout = () => {
   );
   const activeBusiness = data?.find(({ _id }) => _id === chatId);
 
-  if (!activeBusiness && chatId) return <Navigate to={"/chat"} replace />;
+  const { data: chats } = useListBusinesschatsQuery(
+    {
+      receiverId: activeBusiness?.owner._id || "",
+      businessId: activeBusiness?._id || "",
+    },
+    { skip: !activeBusiness?.owner._id }
+  );
+
+  const handleSendMessage = () => {
+    if (newMessage.trim()) {
+      socket.emit("private message", {
+        senderId: user?.id,
+        receiverId: activeBusiness?.owner._id,
+        message: newMessage,
+        businessId: activeBusiness?._id,
+      });
+      setMessages([...messages, { sender: "You", text: newMessage }]);
+      setNewMessage("");
+    }
+  };
+
+  useEffect(() => {
+    if (!chats || !activeBusiness) return;
+
+    const messages = chats.map(({ senderId, message }) => ({
+      sender: senderId === user?.id ? "You" : activeBusiness.name,
+      text: message,
+    }));
+
+    setMessages(messages);
+  }, [chats, user, activeBusiness]);
+
+  useEffect(() => {
+    if (!user) return;
+    socket.connect();
+    socket.emit("register", user?.id);
+    socket.on("private message", ({ senderId, message }) => {
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        {
+          sender: senderId === user?.id ? "You" : activeBusiness?.name || "",
+          text: message,
+        },
+      ]);
+    });
+
+    return () => {
+      socket.disconnect();
+      socket.off("private message");
+    };
+  }, [user, activeBusiness]);
+
+  if (!activeBusiness && chatId && !isLoading)
+    return <Navigate to={"/chat"} replace />;
+  if (!isLoggedIn && !userLoading) return <Navigate to={"/"} replace />;
+  if (isLoading)
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <Loader2 className="animate-spin w-10 h-10 text-gray-500" />
+      </div>
+    );
 
   return (
     <div className="flex h-screen">
-        <Button className="absolute right-[30px] top-[30px]" variant={"outline"} onClick={() => navigate("/")}>
-          Go To Home
-        </Button>
+      <Button
+        className="absolute right-[30px] top-[30px]"
+        variant={"outline"}
+        onClick={() => navigate("/")}
+      >
+        Go To Home
+      </Button>
       <div className="w-1/4 bg-gray-100 p-4 border-r">
         <h2 className="font-semibold text-lg text-gray-900 mb-4">Chat Rooms</h2>
         <input
@@ -103,15 +169,25 @@ const ChatLayout = () => {
               </div>
             </div>
             <div className="flex-1 overflow-y-auto bg-white shadow rounded-lg p-4">
-              <Outlet />
+              <div className="space-y-4">
+                {messages.map((msg, index) => (
+                  <div key={index} className="flex flex-col">
+                    <strong>{msg.sender}</strong>
+                    <p>{msg.text}</p>
+                  </div>
+                ))}
+              </div>
+              <div ref={messagesEndRef} />
             </div>
             <div className="mt-4 flex items-center gap-3">
               <input
                 type="text"
                 className="flex-1 border border-gray-300 rounded-md px-4 py-2"
                 placeholder="Type a message..."
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
               />
-              <Button>Send</Button>
+              <Button onClick={handleSendMessage}>Send</Button>
             </div>
           </div>
         ) : (

@@ -83,6 +83,7 @@ const MyBusiness = () => {
             <div
               key={_id}
               className="flex items-center p-6 shadow-lg rounded-xl space-x-6 border border-gray-200 hover:shadow-xl transform transition duration-300 hover:scale-105 relative"
+              onClick={() => navigate(`/business/my-businesses/${_id}`)}
             >
               <div className="relative w-48 h-48 flex-shrink-0">
                 <img

@@ -62,9 +62,6 @@ export const SignInModal: FC<{
       })
         .unwrap()
         .then((data) => {
-          console.log(data);
-          debugger;
-
           toast.success("Signed up successfully! verify from your email");
           setOpen(false);
         });
