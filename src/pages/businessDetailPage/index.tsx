@@ -6,12 +6,34 @@ import { Button } from "@/components/ui/button";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import config from "@/config";
+import { useState } from "react";
+import AddCommentForm from "@/components/addCommentForm";
+
+const dummyComments = [
+  {
+    id: 1,
+    name: "John Doe",
+    comment: "<p>Great place! Had an amazing experience.</p>",
+  },
+  {
+    id: 2,
+    name: "Jane Smith",
+    comment: "<p>Decent service, but could be better.</p>",
+  },
+  {
+    id: 3,
+    name: "Mike Johnson",
+    comment: "<p>Loved the ambiance and hospitality!</p>",
+  },
+];
 
 const BusinessDetail = () => {
   const { businessId = "" } = useParams();
   const { data: business, isLoading } = useGetBusinessDetailQuery({
     id: businessId,
   });
+
+  const [comments, setComments] = useState(dummyComments);
 
   if (isLoading || !business)
     return (
@@ -72,10 +94,23 @@ const BusinessDetail = () => {
       <div className="space-y-4">
         <Card>
           <CardHeader>
-            <CardTitle>Comments & Ratings</CardTitle>
+            <CardTitle>Comments</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-gray-600">Coming soon...</p>
+            <div className="space-y-4">
+              {comments.map((comment) => (
+                <div key={comment.id} className="border-b pb-2">
+                  <p className="font-semibold">{comment.name}</p>
+                  <p
+                    dangerouslySetInnerHTML={{ __html: comment.comment }}
+                    className="text-gray-600"
+                  ></p>
+                </div>
+              ))}
+            </div>
+            <div className="mt-4">
+              <AddCommentForm businessId={businessId} />
+            </div>
           </CardContent>
         </Card>
       </div>

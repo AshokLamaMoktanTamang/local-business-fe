@@ -73,7 +73,7 @@ export const SignInModal: FC<{
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="max-w-md p-6">
+      <DialogContent className="z-[999] max-w-md p-6">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold">
             {isSignIn ? "Sign In" : "Sign Up"}

@@ -1,4 +1,4 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { Loader2, Search, User } from "lucide-react";
@@ -33,6 +33,12 @@ export default function Layout({ children }: LayoutProps) {
   const [isSignInOpen, setIsSignInOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
+  useEffect(() => {
+    if (searchQuery.length && pathname !== "/") {
+      navigate("/");
+    }
+  }, [searchQuery, pathname]);
+
   if (isLoading)
     return (
       <div className="flex justify-center items-center h-screen">
@@ -43,19 +49,16 @@ export default function Layout({ children }: LayoutProps) {
   return (
     <>
       <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
-        {/* Navbar */}
         <motion.nav
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
           className="w-full bg-white dark:bg-gray-800 shadow-md px-8 py-4 flex justify-between items-center"
         >
-          {/* Logo */}
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
             Local Business
           </h1>
 
-          {/* Search Bar */}
           <div className="relative w-full max-w-lg mx-6">
             <input
               type="text"
@@ -69,7 +72,6 @@ export default function Layout({ children }: LayoutProps) {
             </button>
           </div>
 
-          {/* User Menu */}
           <div className="flex items-center space-x-4">
             {!isLoggedIn ? (
               <Button
@@ -115,7 +117,6 @@ export default function Layout({ children }: LayoutProps) {
           </div>
         </motion.nav>
 
-        {/* Hero Carousel */}
         {!searchQuery.length && pathname === "/" && (
           <Carousel className="w-full h-[400px] mx-auto shadow-lg">
             <CarouselContent>
@@ -127,14 +128,12 @@ export default function Layout({ children }: LayoutProps) {
                     transition={{ duration: 0.4 }}
                     className="relative w-full h-[400px] rounded-lg overflow-hidden shadow-xl"
                   >
-                    {/* Business Image */}
                     <img
                       src={config.assetBaseUrl + business.image}
                       alt={business.name}
                       className="w-full h-full object-cover"
                     />
 
-                    {/* Overlay */}
                     <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-black/80 flex flex-col justify-end p-6 text-white">
                       <h3 className="text-2xl font-bold">{business.name}</h3>
                       <p className="text-lg opacity-80">{business.address}</p>
@@ -146,12 +145,10 @@ export default function Layout({ children }: LayoutProps) {
           </Carousel>
         )}
 
-        {/* Main Content */}
         <main className="flex-1 p-8">
           {children ?? <Outlet context={{ searchQuery }} />}
         </main>
 
-        {/* Footer */}
         <footer className="text-center py-6 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-sm">
           © {new Date().getFullYear()} Local Business. All rights reserved.
         </footer>
