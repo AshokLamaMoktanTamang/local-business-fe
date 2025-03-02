@@ -1,7 +1,7 @@
 import { baseApi } from "@/store/baseApi";
 
 export const businessApi = baseApi
-  .enhanceEndpoints({ addTagTypes: ["business"] })
+  .enhanceEndpoints({ addTagTypes: ["business", "analytics"] })
   .injectEndpoints({
     endpoints: (builder) => ({
       registerBusiness: builder.mutation<void, any>({
@@ -187,6 +187,22 @@ export const businessApi = baseApi
         }),
         providesTags: ["business"],
       }),
+      getBusinessAnalytics: builder.query<
+        Array<{
+          businessName: string;
+          data: Array<{
+            type: string;
+            count: number;
+          }>;
+        }>,
+        void
+      >({
+        query: () => ({
+          url: `business/v1/detail/analytics`,
+          method: "GET",
+        }),
+        providesTags: ["analytics"],
+      }),
     }),
   });
 
@@ -200,4 +216,5 @@ export const {
   useVerifyBusinessMutation,
   useListVerifiedBusinessQuery,
   useGetBusinessDetailQuery,
+  useGetBusinessAnalyticsQuery,
 } = businessApi;
