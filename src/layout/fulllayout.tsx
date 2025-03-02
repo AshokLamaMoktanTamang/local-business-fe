@@ -105,6 +105,9 @@ export default function Layout({ children }: LayoutProps) {
                       Business Panel
                     </DropdownMenuItem>
                   )}
+                  <DropdownMenuItem onClick={() => navigate("/chat")}>
+                    Chat
+                  </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={handleLogout}
                     className="text-red-500"
