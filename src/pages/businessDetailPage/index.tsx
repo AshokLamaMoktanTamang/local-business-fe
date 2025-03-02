@@ -9,6 +9,7 @@ import config from "@/config";
 import AddCommentForm from "@/components/addCommentForm";
 import { useListBusinessCommentsQuery } from "@/store/service/commentApi";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
+import useAuth from "@/hooks/useAuth";
 
 const BusinessDetail = () => {
   const { businessId = "" } = useParams();
@@ -16,10 +17,11 @@ const BusinessDetail = () => {
     id: businessId,
   });
 
+  const { user, isLoading: userLoading } = useAuth();
   const { data: comments, isLoading: commentLoading } =
     useListBusinessCommentsQuery({ business: businessId });
 
-  if (isLoading || !business || commentLoading)
+  if (isLoading || !business || commentLoading || userLoading)
     return (
       <div className="flex justify-center items-center h-screen bg-gray-100">
         <Loader2 className="animate-spin w-10 h-10 text-gray-500" />
@@ -50,9 +52,11 @@ const BusinessDetail = () => {
                 <p className="text-gray-600">📍 {business.address}</p>
                 <p className="text-gray-600">📞 {business.phone}</p>
                 <p className="text-gray-600">✉️ {business.email}</p>
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-                  Contact Owner
-                </Button>
+                {user && (
+                  <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                    Contact Owner
+                  </Button>
+                )}
               </div>
             </div>
           </CardContent>
@@ -123,9 +127,11 @@ const BusinessDetail = () => {
                 </div>
               ))}
             </div>
-            <div className="mt-6">
-              <AddCommentForm businessId={businessId} />
-            </div>
+            {user && (
+              <div className="mt-6">
+                <AddCommentForm businessId={businessId} />
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
