@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import config from "@/config";
 import useAuth from "@/hooks/useAuth";
 import { useListVerifiedBusinessQuery } from "@/store/service/businessApi";
@@ -42,7 +43,7 @@ const ChatLayout = () => {
   );
   const activeBusiness = data?.find(({ _id }) => _id === chatId);
 
-  if (!activeBusiness) return <Navigate to={"/chat"} replace />;
+  if (!activeBusiness && chatId) return <Navigate to={"/chat"} replace />;
 
   return (
     <div className="flex h-screen">
@@ -85,16 +86,16 @@ const ChatLayout = () => {
           <div className="h-full flex flex-col">
             <div className="flex gap-2 flex-row">
               <img
-                src={config.assetBaseUrl + activeBusiness.image}
-                alt={activeBusiness.name}
+                src={config.assetBaseUrl + activeBusiness?.image}
+                alt={activeBusiness?.name}
                 className="w-16 h-16 object-cover rounded-full mr-4"
               />
               <div>
                 <h3 className="text-lg font-semibold text-gray-800">
-                  {activeBusiness.name}
+                  {activeBusiness?.name}
                 </h3>
                 <p className="text-sm text-gray-500">
-                  {activeBusiness.address}
+                  {activeBusiness?.address}
                 </p>
               </div>
             </div>
@@ -107,9 +108,7 @@ const ChatLayout = () => {
                 className="flex-1 border border-gray-300 rounded-md px-4 py-2"
                 placeholder="Type a message..."
               />
-              <button className="bg-blue-500 text-white px-4 py-2 rounded-md">
-                Send
-              </button>
+              <Button>Send</Button>
             </div>
           </div>
         ) : (
