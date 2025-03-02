@@ -1,5 +1,11 @@
 import { ReactNode } from "react";
-import { LayoutDashboard, Users, Settings, LogOut, HomeIcon } from "lucide-react";
+import {
+  LayoutDashboard,
+  Users,
+  Settings,
+  LogOut,
+  HomeIcon,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -12,24 +18,24 @@ import { Navigate, Outlet, useNavigate } from "react-router-dom";
 import useAuth from "@/hooks/useAuth";
 import { USER_ROLE } from "@/store/service/authApi";
 
-const Sidebar = () => {
-  return (
-    <aside className="w-64 bg-gray-900 text-white h-screen p-4 space-y-6">
-      <h2 className="text-xl font-bold">Admin Panel</h2>
-      <nav className="space-y-2">
-        <Button variant="ghost" className="w-full justify-start">
-          <LayoutDashboard className="mr-2 h-5 w-5" /> Businesses
-        </Button>
-        <Button variant="ghost" className="w-full justify-start">
-          <Users className="mr-2 h-5 w-5" /> Users
-        </Button>
-        <Button variant="ghost" className="w-full justify-start">
-          <Settings className="mr-2 h-5 w-5" /> Settings
-        </Button>
-      </nav>
-    </aside>
-  );
-};
+// const Sidebar = () => {
+//   return (
+//     <aside className="w-64 bg-gray-900 text-white h-screen p-4 space-y-6">
+//       <h2 className="text-xl font-bold">Admin Panel</h2>
+//       <nav className="space-y-2">
+//         <Button variant="ghost" className="w-full justify-start">
+//           <LayoutDashboard className="mr-2 h-5 w-5" /> Businesses
+//         </Button>
+//         <Button variant="ghost" className="w-full justify-start">
+//           <Users className="mr-2 h-5 w-5" /> Users
+//         </Button>
+//         <Button variant="ghost" className="w-full justify-start">
+//           <Settings className="mr-2 h-5 w-5" /> Settings
+//         </Button>
+//       </nav>
+//     </aside>
+//   );
+// };
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -72,9 +78,12 @@ const AdminLayout = ({ children }: { children?: ReactNode }) => {
 
   return (
     <div className="flex h-screen">
-      <Sidebar />
+      {/* <Sidebar /> */}
       <div className="flex-1 flex flex-col">
         <Navbar />
+        <h2 className="my-2 mx-2 text-2xl font-bold tracking-wide mb-6">
+          Here are the list of the unverified Business
+        </h2>
         <main className="p-6">{children ?? <Outlet />}</main>
       </div>
     </div>
